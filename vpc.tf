@@ -16,7 +16,7 @@ resource "aws_internet_gateway" "my-gw" {
 
 # Create the private subnet with a valid CIDR block
 resource "aws_subnet" "myprivatesubnet" {
-  cidr_block = "10.0.1.0/24"  # Change to a non-overlapping CIDR block
+  cidr_block = "10.0.0.16/28"  # Change to a non-overlapping CIDR block
   vpc_id    = aws_vpc.my-vpc.id
   tags = {
     Name = "private"
