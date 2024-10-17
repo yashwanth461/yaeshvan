@@ -1,1 +1,3 @@
 .terraform
+terraform* //it moves to untracking terraform files like terraform.tfstate
+.terraform*
