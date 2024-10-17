@@ -5,4 +5,6 @@ resource "aws_instance" "my-web" {
     Name="terraform"
   }
   key_name = "jenkins"
+  subnet_id = aws_subnet.mypublicsubnet.id
+  
 }
