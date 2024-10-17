@@ -1,60 +1,68 @@
+# Create the VPC
 resource "aws_vpc" "my-vpc" {
   cidr_block = "10.0.0.0/24"
   tags = {
-    Name ="my-vpc"
+    Name = "my-vpc"
   }
 }
 
+# Create the Internet Gateway
 resource "aws_internet_gateway" "my-gw" {
-    vpc_id = aws_vpc.my-vpc.id
-  tags ={
-    Name ="my-gw"
+  vpc_id = aws_vpc.my-vpc.id
+  tags = {
+    Name = "my-gw"
   }
 }
 
-resource  "aws_subnet" "myprivatesubnet"{
-    cidr_block = "10.0.0.0/16"
-    vpc_id = aws_vpc.my-vpc.id
-    tags={
-        Name="private"
-    }
+# Create the private subnet with a valid CIDR block
+resource "aws_subnet" "myprivatesubnet" {
+  cidr_block = "10.0.1.0/24"  # Change to a non-overlapping CIDR block
+  vpc_id    = aws_vpc.my-vpc.id
+  tags = {
+    Name = "private"
+  }
 }
 
+# Create the public subnet
 resource "aws_subnet" "mypublicsubnet" {
-    cidr_block = "10.0.0.0/28"
-    vpc_id = aws_vpc.my-vpc.id
-    tags ={
-        Name="public"
-    }
+  cidr_block = "10.0.0.0/28"  # Public subnet CIDR
+  vpc_id    = aws_vpc.my-vpc.id
+  tags = {
+    Name = "public"
+  }
 }
 
-resource "aws_route_table" "privateroute"{
-    vpc_id = aws_vpc.my-vpc.id
-    tags ={
-        Name="private route"
-    }
+# Create the private route table
+resource "aws_route_table" "privateroute" {
+  vpc_id = aws_vpc.my-vpc.id
+  tags = {
+    Name = "private route"
+  }
 }
 
-resource "aws_route_table" "publicroute"{
-    vpc_id = aws_vpc.my-vpc.id
-    tags = {
-         Name="public-route"
-    }
+# Create the public route table
+resource "aws_route_table" "publicroute" {
+  vpc_id = aws_vpc.my-vpc.id
+  tags = {
+    Name = "public-route"
+  }
 }
 
-resource "aws_route_table_association" "privateasso"{
-    subnet_id="aws_subnet_myprivatesubnet.id"
-    route_table_id=aws_route_table_privateroute.id
+# Associate the private subnet with the private route table
+resource "aws_route_table_association" "privateasso" {
+  subnet_id      = aws_subnet.myprivatesubnet.id  # Correct reference
+  route_table_id = aws_route_table.privateroute.id  # Correct reference
 }
 
-resource "aws_route_table_association" "publicasso"{
-    subnet_id="aws_subnet_mypublicsubnet.id"
-    route_table_id=aws_route_table_publicroute.id
+# Associate the public subnet with the public route table
+resource "aws_route_table_association" "publicasso" {
+  subnet_id      = aws_subnet.mypublicsubnet.id  # Correct reference
+  route_table_id = aws_route_table.publicroute.id  # Correct reference
 }
 
+# Create a route in the public route table to allow internet access
 resource "aws_route" "route" {
-  route_table_id = "aws_route_table_publicroute.id"
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id = "aws_internet_gateway.my-gw"
+  route_table_id         = aws_route_table.publicroute.id  # Correct reference
+  destination_cidr_block = "0.0.0.0/0"  # All outbound traffic
+  gateway_id             = aws_internet_gateway.my-gw.id  # Correct reference
 }
-
