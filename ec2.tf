@@ -5,6 +5,7 @@ resource "aws_instance" "my-web" {
     Name="terraformss"
   }
   key_name = "jenkins"
+  
  
   
 }
